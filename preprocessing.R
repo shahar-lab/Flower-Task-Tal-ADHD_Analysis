@@ -65,14 +65,24 @@ sum(is.na(df))
 "all the NAs are the results of lagging in the preprocessing. See df[!complete.cases(df), ] |> View()"
 
 #in case we want to use Stan
-# df = df %>% mutate(offer1 = offer_left,
-#                    offer2 = offer_right,
-#                    choice = chosen,
-#                    selected_offer = ifelse(choice==offer1,0,1),
-#                    first_trial_in_block = (block!=lag(block,default=0))*1)
+df = df %>% mutate(offer1 = offer_left_image,
+                   offer2 = offer_right_image,
+                   choice = chosen,
+                   selected_offer = ifelse(choice==offer1,0,1),
+                   first_trial_in_block = (block!=lag(block,default=0))*1)
 
 "left with 9444 trials for the whole sample"
 
-save(df, file='./data/df.rdata')
-write.csv(df, file='./data/df.csv')
+df["reward"] = as.integer(unlist(df["reward"])) - 1
+df["offer1"] = as.integer(unlist(df["offer1"]))
+df["offer2"] = as.integer(unlist(df["offer2"]))
+df["choice"] = as.integer(unlist(df["choice"]))
+df["selected_offer"] = as.integer(unlist(df["selected_offer"]))
+
+df$delay = df$delay_condition
+df = df %>% mutate(delay_condition = ifelse(delay == 1, 0, 1))
+
+
+save(df, file='./data/stanmodel_baseline_fourarms/df.rdata')
+write.csv(df, file='./data/stanmodel_baseline_fourarms/df.csv')
 
