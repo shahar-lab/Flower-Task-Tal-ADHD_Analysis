@@ -14,9 +14,6 @@ load('./data/stay~reward_onebackXgroupXcondition.rdata')
 library(ggplot2)
 source('./mytheme.r')
 
-#reward main effect
-em=emmeans::emmeans(model,~reward_oneback)
-
 plot(conditional_effects(model,effects = "reward_oneback:group", 
                     conditions = make_conditions(model, "delay_condition")),plot=F)[[1]]+mytheme
 
@@ -27,9 +24,7 @@ cont=  emmeans::contrast(em, list('control'=c(1,-1, -1,1,0,0,0,0),
                                   'control_short'=c(-1,1, 0,0,  0,0,  0,0),
                                   'control_long' =c(0,0, -1,1,  0,0,  0,0),
                                   'adhd_short'   =c(0,0,  0,0, -1,1,  0,0),
-                                   'adhd_long'   =c(0,0,  0,0,  0,0, -1,1),
-                                  'adhd vs control in short'=c(1,-1, 0,0,-1,1,0,0),
-                                  'adhd vs control in long'=c(0,0, 1,-1,0,0,-1,1)))
+                                   'adhd_long'   =c(0,0,  0,0,  0,0, -1,1)))
 
 
 plot(emmeans::regrid(cont), CIs=T,horizontal = FALSE, colors = "orange")+

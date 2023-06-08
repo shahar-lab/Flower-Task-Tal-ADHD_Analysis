@@ -19,10 +19,16 @@ simulate_parameters(path,cfg,plotme=T)
 
 simulate_artifical_data(path,cfg)
 
-# if empirical data
-load('./data/stanmodel_baseline_fourarms/df.rdata')
+#### load empirical data ----------
+load('./data/df.rdata')
+unique(df$delay_condition)
+df["reward"] = as.integer(unlist((df["reward"]=='rewarded')*1))
+df["offer1"] = as.integer(unlist(df["offer1"]))
+df["offer2"] = as.integer(unlist(df["offer2"]))
+df["choice"] = as.integer(unlist(df["choice"]))
+df["selected_offer"] = as.integer(unlist(df["selected_offer"]))
 
-df = df %>% filter(group == 'ADHD' & delay_condition == 1)
+df = df %>% filter(group == 'ADHD' & delay_condition == 'long')
 
 save(df,file = './data/stanmodel_baseline_fourarms/df_adhd_long_data.rdata')
 

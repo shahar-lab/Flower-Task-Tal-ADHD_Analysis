@@ -4,10 +4,12 @@ library(dplyr)
 library(brms)
 
 #### housekeeping -------------
-df$delay_condition<-as.factor(df$delay_condition)
 df$acc<-df$acc*100
+contrasts(df$delay_condition)  = c(-1,1)
+contrasts(df$group)  = c(-1,1)
 contrasts(df$delay_condition)
-#note - we didnt exclude the first trial since this is acc
+contrasts(df$group)
+
 
 #### acc ~ trial -------------------
 
@@ -20,8 +22,9 @@ get_prior(f_model,data=df)
 
 myprior = c(
   prior(normal(50, 25), class = Intercept),
-  prior(normal(0, 25),  class = b        , coef = 'delay_condition7'),
-  prior(normal(0, 25),  class = b        , coef = 'groupADHD'),
+  prior(normal(0, 25),  class = b        , coef = 'delay_condition1'),
+  prior(normal(0, 25),  class = b        , coef = 'group1'),
+  prior(normal(0, 25),  class = b        , coef = 'group1:delay_condition1'),
   prior(student_t(10,0,50), class = sigma )
 )
 
@@ -36,9 +39,8 @@ model<-brm(f_model,
            prior = myprior,
            backend='cmdstan')
 
-
 library(bayestestR)
 describe_posterior(model, rope_range = c(-0.1,+0.1))
 conditional_effects(model)
-save(model,file='./data/acc~groupXcondition.rdata')
+save(model,file='./data/acc~groupXcondition_effectcoding.rdata')
 
