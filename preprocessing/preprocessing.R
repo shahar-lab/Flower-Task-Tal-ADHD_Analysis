@@ -31,6 +31,90 @@ contrasts(df$reward_twoback)
 contrasts(df$reward_oneback)
 contrasts(df$delay_condition)
 unique(df$delay_condition)
+
+
+
+
+#### add cumulative rewards and visits
+
+cum_reward = matrix(0,nrow = nrow(df),ncol = 4)
+cum_visits = matrix(0,nrow = nrow(df),ncol = 4)
+
+chosen     = df$chosen
+unchosen   = df$unchosen
+reward     = df$reward
+
+for ( i in 2:nrow(df)) {
+  
+  print(i)
+  
+  cum_reward[i,] = cum_reward[i-1,] 
+  cum_visits[i,] = cum_visits[i-1,] 
+  
+  if (!is.na(chosen[i])){
+    
+    cum_reward[i,chosen[i]] = cum_reward[i,chosen[i]] + (as.numeric(reward[i])-1)
+    cum_visits[i,chosen[i]] = cum_visits[i,chosen[i]] + 1
+    
+  }
+  
+  if (df$trial[i]==1){
+    
+    cum_reward[i,] = 0
+    cum_visits[i,] = 0
+    
+  }
+}
+df$cum_reward_ch1 = cum_reward[,1]
+df$cum_reward_ch2 = cum_reward[,2]
+df$cum_reward_ch3 = cum_reward[,3]
+df$cum_reward_ch4 = cum_reward[,4]
+
+df$cum_visit_ch1  = cum_visits[,1]
+df$cum_visit_ch2  = cum_visits[,2]
+df$cum_visit_ch3  = cum_visits[,3]
+df$cum_visit_ch4  = cum_visits[,4]
+
+
+df$mean_reward_ch1 = ifelse(is.na(cum_reward[,1] / (cum_visits[,1])),0,(cum_reward[,1] / (cum_visits[,1])))
+df$mean_reward_ch2 = ifelse(is.na(cum_reward[,2] / (cum_visits[,2])),0,(cum_reward[,2] / (cum_visits[,2])))
+df$mean_reward_ch3 = ifelse(is.na(cum_reward[,3] / (cum_visits[,3])),0,(cum_reward[,3] / (cum_visits[,3])))
+df$mean_reward_ch4 = ifelse(is.na(cum_reward[,4] / (cum_visits[,4])),0,(cum_reward[,4] / (cum_visits[,4])))
+
+cum_reward_chosen = cum_reward_unchosen = 
+  cum_visit_chosen  = cum_visit_unchosen  = 
+  cum_visit_chosen  = cum_visit_unchosen  = 
+  mean_reward_chosen = mean_reward_unchosen = 
+  df$trial*0
+
+for ( i in 1:nrow(df)) {
+  
+  cum_reward_chosen[i]   = cum_reward[i,chosen[i]]
+  cum_reward_unchosen[i] = cum_reward[i,unchosen[i]]
+  cum_visit_chosen[i]    = cum_visits[i,chosen[i]]
+  cum_visit_unchosen[i]  = cum_visits[i,unchosen[i]]
+  
+  if(!is.na(cum_visit_chosen[i]) & cum_visit_chosen[i] > 0){
+    mean_reward_chosen[i]    = cum_reward_chosen[i] / cum_visit_chosen[i]
+  }
+  if(!is.na(cum_visit_unchosen[i]) & cum_visit_unchosen[i] > 0){
+    mean_reward_unchosen[i]  = cum_reward_unchosen[i] / cum_visit_unchosen[i]
+  }
+  
+}
+df$cum_reward_chosen   = cum_reward_chosen
+df$cum_reward_unchosen = cum_reward_unchosen
+df$cum_visit_chosen    = cum_visit_chosen
+df$cum_visit_unchosen  = cum_visit_unchosen
+df$cum_visit_chosen    = cum_visit_chosen
+df$cum_visit_unchosen  = cum_visit_unchosen
+df$mean_reward_chosen  = mean_reward_chosen
+df$mean_reward_unchosen= mean_reward_unchosen
+
+
+df$subj_acc = ifelse((df$mean_reward_chosen + df$mean_reward_unchosen)==0,NA,(df$mean_reward_chosen > df$mean_reward_unchosen)*1)
+
+
 #### mark very long or very short RTs --------
 
 df= df %>% mutate(abort = ( rt < 0.2 | rt > 5 | is.na(rt)))

@@ -9,10 +9,10 @@ df$acc<-df$acc*100
 df$trial_centered <- scale(df$trial,center = T,scale = F)
 #note - we didnt exclude the first trial since this is acc
 
-load('./data/stay~reward_onebackXgroupXcondition.rdata')
+load('./data/regression/stay~reward_onebackXgroupXcondition.rdata')
 
 library(ggplot2)
-source('./mytheme.r')
+source('./functions/mytheme.r')
 
 #reward main effect
 em=emmeans::emmeans(model,~reward_oneback)
